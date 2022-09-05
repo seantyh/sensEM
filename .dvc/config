@@ -1,2 +1,7 @@
 [core]
     autostage = true
+    remote = s3
+[cache]
+    type = "hardlink,symlink"
+['remote "s3"']
+    url = s3://seantyh-dvc-sensem
