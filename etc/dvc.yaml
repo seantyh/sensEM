@@ -1,0 +1,7 @@
+stages:
+  sense-emb:
+    cmd: nbconvert --execute --inplace 10.11-sense-emb.ipynb
+    deps:
+    - ../data/dt-asbc
+    outs:
+    - ../data/dt-asbc.word2vec.kv.bin

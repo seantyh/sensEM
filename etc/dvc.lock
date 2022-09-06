@@ -1,0 +1,13 @@
+schema: '2.0'
+stages:
+  sense-emb:
+    cmd: nbconvert --execute --inplace 10.11-sense-emb.ipynb
+    deps:
+    - path: ../data/dt-asbc
+      md5: 78e6da5e5eb104019e400d3495c478b8.dir
+      size: 162507823
+      nfiles: 141
+    outs:
+    - path: ../data/dt-asbc.word2vec.kv.bin
+      md5: 048ec367238be834d5fab70f37d38533
+      size: 92057589
