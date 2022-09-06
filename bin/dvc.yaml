@@ -1,0 +1,6 @@
+stages:
+  dt-asbc:
+    desc: generate tagged asbc
+    cmd: python tag_asbc.py
+    outs:
+    - ../data/dt-asbc/

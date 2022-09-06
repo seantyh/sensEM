@@ -33,50 +33,48 @@ if __name__ == "__main__":
     out_dir = Path("../data/dt-asbc")
     out_dir.mkdir(exist_ok=True, parents=True)
     
-    batch_size = 10_000
-# batch_size = 20
-batch_idx = 0
-n_batch = math.ceil(n_sentence / batch_size)
-path_templ = f"asbc_dotted_tagged_{{batch_idx:03d}}-of-{n_batch}.txt"
-batch_path = out_dir / path_templ.format(batch_idx=batch_idx)
-if not batch_path.exists():
-    fout = batch_path.open("w", encoding="utf-8")
-else:
-    fout = None
+    batch_size = 10_000    
+    batch_idx = 0
+    n_batch = math.ceil(n_sentence / batch_size)
+    path_templ = f"asbc_dotted_tagged_{{batch_idx:03d}}-of-{n_batch}.txt"
+    batch_path = out_dir / path_templ.format(batch_idx=batch_idx)
+    if not batch_path.exists():
+        fout = batch_path.open("w", encoding="utf-8")
+    else:
+        fout = None
 
-for sent_i, sent_x in enumerate(tqdm(corpus.iter_sentences(), total=n_sentence)):
-    ## if file already exists, fout is None, 
-    ## then skip the tagging part
-    if fout:
-        ## tagging
-        try:
-            tok_seq = list(map(tok_func, sent_x))
-            sense_tagged = tagger.sense_tag_per_sentence(tok_seq)
-            sense_tagged = list(map(tagged_func, sense_tagged))
-            for tok_i, tagged_tok in enumerate(sense_tagged):
-                if tagged_tok[2] and not tagged_tok[2].startswith("RP:"):
-                    # it is tagged
-                    fout.write(f"{tagged_tok[0]}-{tagged_tok[2]}")
-                else:
-                    # it is not tagged
-                    fout.write(f"{tagged_tok[0]}-{tagged_tok[1]}")
-                if tok_i < len(sense_tagged)-1:
-                    fout.write(" ")
-            fout.write("\n")
-        except Exception as ex:
-            print(ex)
+    for sent_i, sent_x in enumerate(tqdm(corpus.iter_sentences(), total=n_sentence)):
+        ## if file already exists, fout is None, 
+        ## then skip the tagging part
+        if fout:
+            ## tagging
+            try:
+                tok_seq = list(map(tok_func, sent_x))
+                sense_tagged = tagger.sense_tag_per_sentence(tok_seq)
+                sense_tagged = list(map(tagged_func, sense_tagged))
+                for tok_i, tagged_tok in enumerate(sense_tagged):
+                    if tagged_tok[2] and not tagged_tok[2].startswith("RP:"):
+                        # it is tagged
+                        fout.write(f"{tagged_tok[0]}-{tagged_tok[2]}")
+                    else:
+                        # it is not tagged
+                        fout.write(f"{tagged_tok[0]}-{tagged_tok[1]}")
+                    if tok_i < len(sense_tagged)-1:
+                        fout.write(" ")
+                fout.write("\n")
+            except Exception as ex:
+                print(ex)
+
+        if (sent_i+1) % batch_size == 0:        
+            batch_idx += 1
+
+            batch_path = out_dir / path_templ.format(batch_idx=batch_idx)
+            if not batch_path.exists():
+                if fout: fout.close()
+                fout = Path(batch_path).open("w", encoding="utf-8")
+            else:
+                fout = None
     
-    if (sent_i+1) % batch_size == 0:
-        if fout: fout.close()
-        batch_idx += 1
-        
-        if batch_idx > 6:
-            break                    
-        batch_path = out_dir / path_templ.format(batch_idx=batch_idx)
-        if not batch_path.exists():
-            fout = Path(batch_path).open("w", encoding="utf-8")
-        else:
-            fout = None
-
+    ## close the last batch
     if fout:
         fout.close()

@@ -1,0 +1,9 @@
+schema: '2.0'
+stages:
+  dt-asbc:
+    cmd: python tag_asbc.py
+    outs:
+    - path: ../data/dt-asbc/
+      md5: 78e6da5e5eb104019e400d3495c478b8.dir
+      size: 162507823
+      nfiles: 141
